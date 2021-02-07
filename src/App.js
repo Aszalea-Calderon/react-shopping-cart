@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { Route } from "react-router-dom";
 import data from "./data";
 import { ProductContext } from "./contexts/ProductContext";
+import { CartContext } from "./contexts/CartContext";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 // Components
 import Navigation from "./components/Navigation";
@@ -12,7 +14,7 @@ import ShoppingCart from "./components/ShoppingCart";
 
 function App() {
   const [products] = useState(data);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useLocalStorage("cart", []);
 
   //?Step 1- Fill out needed functionality for the page
 
@@ -34,18 +36,20 @@ function App() {
   //?Step 3- Wrap and pass the ProductContext giving the values needed in the application, any values passed to the app via props
   return (
     <ProductContext.Provider value={{ addItem, products }}>
-      <div className="App">
-        <Navigation cart={cart} />
+      <CartContext.Provider value={{ cart, removeItem }}>
+        <div className="App">
+          <Navigation />
 
-        {/* Routes */}
-        <Route exact path="/">
-          <Products />
-        </Route>
+          {/* Routes */}
+          <Route exact path="/">
+            <Products />
+          </Route>
 
-        <Route path="/cart">
-          <ShoppingCart cart={cart} />
-        </Route>
-      </div>
+          <Route path="/cart">
+            <ShoppingCart />
+          </Route>
+        </div>
+      </CartContext.Provider>
     </ProductContext.Provider>
   );
 }
